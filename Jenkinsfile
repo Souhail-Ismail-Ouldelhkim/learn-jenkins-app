@@ -33,7 +33,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Testing the new Laptop...'
-                sh 'test -f build/computer.txt'
+                sh 'test -f build/index.html'
             }
         }
 
