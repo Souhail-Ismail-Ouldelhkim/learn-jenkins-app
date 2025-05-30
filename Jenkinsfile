@@ -3,11 +3,24 @@
 
     stages {
         stage('Build steps') {
+
+            agent {
+                docker {
+                image 'node:18-alpine'
+                reuseNode true
+                }
+            }
             steps {
                 echo 'Building a new Laptop...'
                 sh '''
                     mkdir -p build
                     touch build/computer.txt
+                    ls -la
+                    npm ci
+                    npm run build
+                    ls -la
+                    node --version
+                    npm --version
                     echo "Mainboard" >> build/computer.txt
                     cat build/computer.txt
                     echo "Display" >> build/computer.txt
