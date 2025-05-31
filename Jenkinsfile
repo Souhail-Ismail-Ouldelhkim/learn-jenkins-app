@@ -84,7 +84,7 @@ pipeline {
 
         always {
             echo 'Rebuilding the Laptop after cleanup...'
-            junit 'test-results/junit.xml'
+            junit 'jest-results/junit.xml'
             sh '''
                 mkdir -p build
                 touch build/computer.txt
