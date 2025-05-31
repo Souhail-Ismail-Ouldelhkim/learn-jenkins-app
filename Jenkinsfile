@@ -46,6 +46,22 @@ pipeline {
                 sh 'npm test'
             }
         }
+         
+        stage('E2E') {
+                        agent {
+                docker {
+                    image 'docker pull mcr.microsoft.com/playwright:v1.52.0-noble'
+                    reuseNode true
+                }
+            }
+            // ceci est un script #
+            steps {
+                echo 'Testing project with E2E...'
+                sh 'npm install -g serve'
+                sh 'serve -s build'
+                sh 'npx playwright test'
+            }
+        }
 
         stage('Deploy') {
             steps {
