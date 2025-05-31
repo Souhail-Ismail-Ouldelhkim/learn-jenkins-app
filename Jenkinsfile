@@ -1,8 +1,10 @@
 pipeline {
     agent any
 
+   
+    // éxecution n'est pas nécessaire pour les Tests 
     stages {
-        stage('Build steps') {
+       /* stage('Build steps') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -29,7 +31,7 @@ pipeline {
                 '''
             }
         }
-
+*/
         stage('Test') {
                         agent {
                 docker {
@@ -37,6 +39,7 @@ pipeline {
                     reuseNode true
                 }
             }
+            // ceci est un script #
             steps {
                 echo 'Testing the new Laptop...'
                 sh 'test -f build/index.html'
