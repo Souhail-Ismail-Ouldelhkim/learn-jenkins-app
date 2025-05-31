@@ -1,10 +1,10 @@
 pipeline {
     agent any
 
-   
-    // éxecution n'est pas nécessaire pour les Tests 
     stages {
-       /* stage('Build steps') {
+
+        /*
+        stage('Build steps') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -23,49 +23,46 @@ pipeline {
                     node --version
                     npm --version
                     echo "Mainboard" >> build/computer.txt
-                    cat build/computer.txt
                     echo "Display" >> build/computer.txt
-                    cat build/computer.txt
                     echo "Keyboard" >> build/computer.txt
                     cat build/computer.txt
                 '''
             }
         }
-*/
+        */
+
         stage('Test') {
-                        agent {
+            agent {
                 docker {
                     image 'node:18-alpine'
                     reuseNode true
                 }
             }
-            // ceci est un script #
             steps {
                 echo 'Testing the new Laptop...'
                 sh 'test -f build/index.html'
                 sh 'npm test'
             }
         }
-         
+
         stage('E2E') {
-                        agent {
+            agent {
                 docker {
-                    image 'docker pull mcr.microsoft.com/playwright:v1.52.0-noble'
-                    sh 'node_modules/.bin/serve -s build &'
-                    sleep 10
+                    image 'mcr.microsoft.com/playwright:v1.52.0-noble'
                     reuseNode true
                 }
             }
-            // ceci est un script #
             steps {
                 echo 'Testing project with E2E...'
                 sh 'npm install -g serve'
-                sh 'serve -s build'
+                sh 'nohup serve -s build > serve.log 2>&1 &'
+                sh 'sleep 10'
                 sh 'npx playwright test'
             }
         }
 
-      /*  stage('Deploy') {
+        /*
+        stage('Deploy') {
             steps {
                 echo 'Deploying the new Laptop...'
                 sh '''
@@ -86,15 +83,13 @@ pipeline {
         }
 
         always {
-            echo 'Rebuilding the Laptop after cleanup... delette cleanws '
+            echo 'Rebuilding the Laptop after cleanup...'
             junit 'test-results/junit.xml'
             sh '''
                 mkdir -p build
                 touch build/computer.txt
                 echo "Mainboard" >> build/computer.txt
-                cat build/computer.txt
                 echo "Display" >> build/computer.txt
-                cat build/computer.txt
                 echo "Keyboard" >> build/computer.txt
                 cat build/computer.txt
             '''
