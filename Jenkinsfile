@@ -63,7 +63,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+      /*  stage('Deploy') {
             steps {
                 echo 'Deploying the new Laptop...'
                 sh '''
@@ -74,6 +74,7 @@ pipeline {
                 '''
             }
         }
+        */
     }
 
     post {
