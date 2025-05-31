@@ -52,6 +52,7 @@ pipeline {
                 docker {
                     image 'docker pull mcr.microsoft.com/playwright:v1.52.0-noble'
                     reuseNode true
+                    #args '-u root:root'
                 }
             }
             // ceci est un script #
