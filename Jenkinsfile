@@ -64,8 +64,8 @@ pipeline {
         }
 
         always {
-            cleanWs()
-            echo 'Rebuilding the Laptop after cleanup...'
+            echo 'Rebuilding the Laptop after cleanup... delette cleanws '
+            junit 'test-results/junit.xml'
             sh '''
                 mkdir -p build
                 touch build/computer.txt
