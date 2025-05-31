@@ -54,8 +54,8 @@ pipeline {
             }
             steps {
                 echo 'Testing project with E2E...'
-                sh 'npm install -g serve'
-                sh 'nohup serve -s build > serve.log 2>&1 &'
+                sh 'npm install serve'
+                sh 'npx serve -s build > serve.log 2>&1 &'
                 sh 'sleep 10'
                 sh 'npx playwright test'
             }
