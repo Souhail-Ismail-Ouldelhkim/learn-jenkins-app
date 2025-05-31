@@ -54,7 +54,6 @@ pipeline {
                     sh 'node_modules/.bin/serve -s build &'
                     sleep 10
                     reuseNode true
-                    #args '-u root:root'
                 }
             }
             // ceci est un script #
