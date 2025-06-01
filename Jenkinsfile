@@ -24,18 +24,19 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('E2E') {
             agent {
                 docker {
-                    image 'node:18-alpine'
+                    image 'docker pull mcr.microsoft.com/playwright:v1.52.0-noble'
                     reuseNode true
                 }
             }
 
             steps {
                 sh '''
-                    test -f build/index.html
-                    npm test
+                    npm install -g serve
+                    serve -s build
+                    npx playwright test
                 '''
                 sh '#npm ci'
                 // cette commande ne sera pas éxécuter
