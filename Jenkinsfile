@@ -9,6 +9,9 @@ pipeline {
                     reuseNode true
                 }
             }
+            /* this is a comments in jenkins file */
+
+            // a comment have this color
             steps {
                 sh '''
                     ls -la
@@ -34,6 +37,8 @@ pipeline {
                     test -f build/index.html
                     npm test
                 '''
+                sh '#npm ci'
+                // cette commande ne sera pas éxécuter
             }
         }
     }
