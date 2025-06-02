@@ -2,6 +2,8 @@ pipeline {
     agent any
 
     stages {
+        /*
+
         stage('Build') {
             agent {
                 docker {
@@ -9,9 +11,6 @@ pipeline {
                     reuseNode true
                 }
             }
-            /* this is a comments in jenkins file */
-
-            // a comment have this color
             steps {
                 sh '''
                     ls -la
@@ -23,11 +22,28 @@ pipeline {
                 '''
             }
         }
+        */
+
+        stage('Test') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+
+            steps {
+                sh '''
+                    #test -f build/index.html
+                    npm test
+                '''
+            }
+        }
 
         stage('E2E') {
             agent {
                 docker {
-                    image 'docker pull mcr.microsoft.com/playwright:v1.52.0-noble'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
                     reuseNode true
                 }
             }
@@ -36,17 +52,16 @@ pipeline {
                 sh '''
                     npm install serve
                     node_modules/.bin/serve -s build &
-                    npx playwright
+                    sleep 10
+                    npx playwright test
                 '''
-                sh '#npm ci'
-                // cette commande ne sera pas éxécuter
             }
         }
     }
 
     post {
         always {
-            junit 'test-results/junit.xml'
+            junit 'jest-results/junit.xml'
         }
     }
 }
