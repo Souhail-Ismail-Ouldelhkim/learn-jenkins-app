@@ -1,7 +1,0 @@
-{
-  "jenkins.pipeline.linter.connector.url": "http://localhost:8080",
-  "jenkins.pipeline.linter.connector.user": "Souhail_Ismail-Ouldelhkim",
-  "jenkins.pipeline.linter.connector.password": "11c1dfc1a7f5ecfa14b6c9c06875ffd582",
-  "jenkins.pipeline.linter.connector.strict": true,
-  "jenkins.pipeline.linter.connector.jenkinsfilePath": "file:///C:/Users/lenovo/Desktop/JenkinsFormationUdemy/learn-jenkins-app/Jenkinsfile"
-}
