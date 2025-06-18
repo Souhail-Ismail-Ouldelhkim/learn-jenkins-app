@@ -1,15 +1,8 @@
 pipeline {
-    agent any
+    agent any // Suppose que Node.js est déjà installé sur l'agent
 
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock' // Monte le socket Docker
-                    reuseNode true
-                }
-            }
             steps {
                 sh '''
                     ls -la
@@ -24,13 +17,6 @@ pipeline {
         stage('Tests') {
             parallel {
                 stage('Unit tests') {
-                    agent {
-                        docker {
-                            image 'node:18-alpine'
-                            args '-v /var/run/docker.sock:/var/run/docker.sock'
-                            reuseNode true
-                        }
-                    }
                     steps {
                         sh 'npm test'
                     }
@@ -41,16 +27,9 @@ pipeline {
                     }
                 }
                 stage('E2E') {
-                    agent {
-                        docker {
-                            image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
-                            args '-v /var/run/docker.sock:/var/run/docker.sock'
-                            reuseNode true
-                        }
-                    }
                     steps {
                         sh '''
-                            npm install serve
+                            npm install serve playwright
                             node_modules/.bin/serve -s build &
                             sleep 10
                             npx playwright test --reporter=html
@@ -64,5 +43,12 @@ pipeline {
                 }
             }
         }
+        stage('Debug Docker') {
+            steps {
+                sh 'echo $DOCKER_HOST'
+        sh 'docker version'
+        sh 'docker info'
+    }
+}
     }
 }
