@@ -27,10 +27,11 @@ pipeline {
                     images 'node:18-alpine'
                     reuseNode true
                 }
-                steps {
+            steps {
                     sh '''
                       ls -la
                       echo " Test Application " 
+                      npm ci
                       npm test
                       ls -la
                     '''
