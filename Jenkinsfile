@@ -22,12 +22,7 @@ pipeline {
         }
 
         stage('Test'){
-            agent {
-                docker {
-                    images 'node:18-alpine'
-                    reuseNode true
-                }
-            steps {
+               steps {
                     sh '''
                       ls -la
                       echo " Test Application " 
@@ -35,8 +30,7 @@ pipeline {
                       npm test
                       ls -la
                     '''
-                }
-            }
+               }
         }
     }
 }
