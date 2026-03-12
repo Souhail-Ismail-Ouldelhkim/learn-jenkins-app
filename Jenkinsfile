@@ -2,47 +2,39 @@ pipeline {
     agent any
 
     stages {
-        stage('w/o docker') {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
             steps {
-                sh ''' 
-                echo "Without docker"
-                ls -la 
-                touch container-no.txt
+                sh '''
+                    ls -la
+                    node --version
+                    npm --version
+                    npm ci
+                    npm run build 
+                    ls -la
                 '''
-                /* lister le contenu qui se trouve dans le dossier ou en execute le job */
-                /* directly on agent */
             }
         }
 
-         stage('Build') {
+        stage('Test'){
             agent {
                 docker {
-                    image 'node:18-alpine'
-                    reuseNode  true
-                    sh ''' 
-                    echo "Build stage with docker"
+                    images 'node:18-alpine'
+                    reuseNode true
+                }
+                step {
+                    sh '''
+                      ls -la
+                      echo " Test Application " 
+                      npm test
+                      ls -la
                     '''
                 }
-            }
-
-        stage('w/ docker') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode  true
-                    /* agent will just download a image not install */
-                }
-            }
-            steps {
-                sh 'echo "With docker"'
-                sh 'npm --version'
-                sh 'node --version'
-                sh ' ls -la '
-                sh ' touch withDocker.txt '
-                npm ci 
-                npm run build
-                ls -la
-                /* this command will be install in docker agent not jenkins principal agent */
             }
         }
     }
