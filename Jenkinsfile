@@ -14,6 +14,17 @@ pipeline {
             }
         }
 
+         stage('Build') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode  true
+                    sh ''' 
+                    echo "Build stage with docker"
+                    '''
+                }
+            }
+
         stage('w/ docker') {
             agent {
                 docker {
@@ -25,8 +36,12 @@ pipeline {
             steps {
                 sh 'echo "With docker"'
                 sh 'npm --version'
+                sh 'node --version'
                 sh ' ls -la '
                 sh ' touch withDocker.txt '
+                npm ci 
+                npm run build
+                ls -la
                 /* this command will be install in docker agent not jenkins principal agent */
             }
         }
