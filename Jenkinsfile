@@ -26,7 +26,6 @@ pipeline {
                     sh '''
                       ls -la
                       echo " Test Application " 
-                      npm ci
                       npm test
                       ls -la
                     '''
