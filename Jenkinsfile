@@ -40,7 +40,7 @@ pipeline {
         stage('Test E2E '){
              agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.58.2-noble'
+                    image 'mcr.microsoft.com/playwright:v1.39.0-noble'
                     reuseNode true
                                          // args '-u root:root' 
                 } 
@@ -53,7 +53,7 @@ pipeline {
                       # playwright a besoin d'un url pour Naviguer
                       # Probleme root dans workspace
                       node_modules/.bin/serve -s build & 
-                      sleep 10
+   
                       npx playwright test
                     '''
                }
