@@ -42,14 +42,17 @@ pipeline {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.58.2-noble'
                     reuseNode true
+                                         // args '-u root:root' 
                 } 
             }
                steps {
                     sh '''
                       # this is just Test
-                      npm run build
-                      #playwright a besoin d'un url pour Naviguer
-                      serve -s build #
+                      # npm install -g serve  
+                      # this command need a root on peut installer localement et faire npx serve 
+                      # playwright a besoin d'un url pour Naviguer
+                      # Probleme root dans workspace
+                      node_modules\.bin\serve -s build 
                       sleep 4
                       npx playwright test
                     '''
