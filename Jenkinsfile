@@ -61,8 +61,14 @@ pipeline {
     }
 
    post {
-    always {
-        junit 'jest-results/junit.xml'
+      always {
+        junit allowEmptyResults: true, testResults: 'jest-results/junit.xml'
+        // rapport playwright
+        publishHTML([
+            allowMissing: true,
+            reportDir: 'playwright-report',
+            reportFiles: 'index.html',
+            reportName: 'Playwright E2E Report'
+        ])
     }
-   }
 }
