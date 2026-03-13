@@ -21,7 +21,7 @@ pipeline {
             }
         }
 
-        stage ('Run Tests') {
+        stage ('Tests') {
             parallel {
                           stage('Test'){
              agent {
@@ -39,7 +39,7 @@ pipeline {
                }
         }
 
-        stage('Test E2E '){
+        stage('E2E '){
              agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.50.0-noble'
