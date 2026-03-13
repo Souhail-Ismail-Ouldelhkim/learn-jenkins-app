@@ -54,22 +54,16 @@ pipeline {
                       # Probleme root dans workspace
                       node_modules/.bin/serve -s build & 
    
-                      npx playwright test
+                      npx playwright test --reporter=html
+
                     '''
                }
         }
     }
 
    post {
-      always {
-        junit allowEmptyResults: true, testResults: 'jest-results/junit.xml'
-        // rapport playwright
-        publishHTML([
-            allowMissing: true,
-            reportDir: 'playwright-report',
-            reportFiles: 'index.html',
-            reportName: 'Playwright E2E Report'
-        ])
+    always {
+        junit 'jest-results/junit.xml'
     }
-}
+   }
 }
