@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Build') {
             agent {
                 docker {
@@ -15,70 +16,59 @@ pipeline {
                     node --version
                     npm --version
                     npm ci
-                    npm run build 
+                    npm run build
                     ls -la
                 '''
             }
         }
 
-        stage ('Tests') {
+        stage('Tests') {
             parallel {
-                          stage('Test'){
-             agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
+                stage('Unit tests') {
+                    agent {
+                        docker {
+                            image 'node:18-alpine'
+                            reuseNode true
+                        }
+                    }
+
+                    steps {
+                        sh '''
+                            #test -f build/index.html
+                            npm test
+                        '''
+                    }
+                    post {
+                        always {
+                            junit 'jest-results/junit.xml'
+                        }
+                    }
+                }
+
+                stage('E2E') {
+                    agent {
+                        docker {
+                            image 'mcr.microsoft.com/playwright:v1.50.0'
+                            reuseNode true
+                        }
+                    }
+
+                    steps {
+                        sh '''
+                            npm install serve
+                            node_modules/.bin/serve -s build &
+                            sleep 10
+                            npx playwright test  --reporter=html
+                        '''
+                    }
+
+                    post {
+                        always {
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
+                        }
+                    }
                 }
             }
-               steps {
-                    sh '''
-                      # this is just Test
-                      test -f build/index.html
-                      npm test
-                    '''
-               }
-
-                post {
-    always {
-        junit 'jest-results/junit.xml'
-    }
-   }
-
-        }
-
-        stage('E2E '){ 
-            parallel {
-agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0-noble'
-                    reuseNode true
-                                         // args '-u root:root' 
-                } 
-            }
-               steps {
-                    sh '''
-                      # this is just Test
-                      # npm install -g serve  
-                      # this command need a root on peut installer localement et faire npx serve 
-                      # playwright a besoin d'un url pour Naviguer
-                      # Probleme root dans workspace
-                      node_modules/.bin/serve -s build & 
-   
-                      npx playwright test --reporter=html
-
-                    '''
-               }
-        }
-            } 
-            }
-         
-
- post {
-    always {
-        publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, icon: '', keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
-    }
-   }
-
         }
     }
 }
