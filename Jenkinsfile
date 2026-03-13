@@ -46,8 +46,9 @@ pipeline {
 
         }
 
-        stage('E2E '){
-             agent {
+        stage('E2E '){ 
+            parallel {
+agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.50.0-noble'
                     reuseNode true
@@ -69,6 +70,8 @@ pipeline {
                }
         }
             } 
+            }
+         
 
  post {
     always {
