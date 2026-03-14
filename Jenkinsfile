@@ -94,7 +94,6 @@ pipeline {
                 '''
             }
         }        
-        }
 
         stage('E2E - Production') {
             agent {
