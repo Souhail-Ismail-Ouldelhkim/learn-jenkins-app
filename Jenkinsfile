@@ -4,7 +4,7 @@ pipeline {
          NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
          NETLIFY_AUTH_TOKEN = credentials('netlify-token')
       }
-    stages {
+    stages { 
 
         stage('Build') {
             agent {
@@ -89,7 +89,7 @@ pipeline {
                 echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                 # Appelation depuis le dossier Local nodes_modules necessite node qui se trouve dans node_modules
                 node_modules/.bin/netlify status
-                
+                node_modules/.bin/netlify deploy --dir=build --prod --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
 
 
                 '''
