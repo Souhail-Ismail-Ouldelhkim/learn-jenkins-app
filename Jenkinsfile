@@ -1,8 +1,8 @@
 pipeline {
     agent any
       environment {
-         NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
-         NETLIFY_SITE_ID = credentials('netlify-site-id')
+         NETLIFY_AUTH_TOKEN = ""
+         NETLIFY_SITE_ID = ""
          NETTLIFY_DEPLOY_MESSAGE = "Automatiser Deploy Netflify From Jenkins " 
       }
     stages {
