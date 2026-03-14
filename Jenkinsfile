@@ -83,7 +83,7 @@ pipeline {
             steps {
                 sh '''
 
-                npm install -g netlify
+                npm install netlify-cli
                 node_modules/.bin/netlify --version 
                 echo ' Deploying to the production. Site ID: $NETLIFY_SITE_ID' 
                 # Appelation depuis le dossier Local nodes_modules necessite node qui se trouve dans node_modules
