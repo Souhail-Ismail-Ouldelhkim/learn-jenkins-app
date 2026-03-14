@@ -1,6 +1,10 @@
 pipeline {
     agent any
-
+      environment {
+         NETLIFY_AUTH_TOKEN = credentials('netlify-auth-token')
+         NETLIFY_SITE_ID = credentials('netlify-site-id')
+         NETTLIFY_DEPLOY_MESSAGE = "Automatiser Deploy Netflify From Jenkins " 
+      }
     stages {
 
         stage('Build') {
@@ -68,6 +72,24 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+
+        stage('Deploy - Netlify') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+
+                npm install -g netlify@20.1.1
+                node_modules/.bin/netlify --version 
+                # Appelation depuis le dossier Local nodes_modules necessite node qui se trouve dans node_modules
+
+                '''
             }
         }
     }
