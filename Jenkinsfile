@@ -89,8 +89,7 @@ pipeline {
                 echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                 # Appelation depuis le dossier Local nodes_modules necessite node qui se trouve dans node_modules
                 node_modules/.bin/netlify status
-                node_modules/.bin/netlify deploy --dir=build --prod --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
-
+                node_modules/.bin/netlify deploy  --dir=build  --prod  --no-build  --site=$NETLIFY_SITE_ID  --auth=$NETLIFY_AUTH_TOKEN
 
                 '''
             }
