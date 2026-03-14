@@ -1,9 +1,7 @@
 pipeline {
     agent any
       environment {
-         NETLIFY_AUTH_TOKEN = ""
-         NETLIFY_SITE_ID = ""
-         NETTLIFY_DEPLOY_MESSAGE = "Automatiser Deploy Netflify From Jenkins " 
+         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
       }
     stages {
 
@@ -85,8 +83,9 @@ pipeline {
             steps {
                 sh '''
 
-                npm install -g netlify@20.1.1
+                npm install -g netlify
                 node_modules/.bin/netlify --version 
+                echo ' Deploying to the production. Site ID: $NETLIFY_SITE_ID' 
                 # Appelation depuis le dossier Local nodes_modules necessite node qui se trouve dans node_modules
 
                 '''
