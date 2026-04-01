@@ -15,6 +15,7 @@ pipeline {
                     image 'node:18-alpine'
                     reuseNode true
                 }
+                
             }
             steps {
                 sh '''
@@ -83,7 +84,57 @@ pipeline {
             }
         }
 
-        stage('Deploy - Netlify') {
+        stage('Deploy - Netlify - Staging') {
+            agent {
+                docker {
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
+            steps {
+                sh '''
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version
+                    echo "Deploying to Staging. Site ID: $NETLIFY_SITE_ID"
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy \
+                        --dir=build \
+                        --no-build \
+                        --site=$NETLIFY_SITE_ID \
+                        --auth=$NETLIFY_AUTH_TOKEN
+                '''
+            }
+        }
+        
+        stage('E2E - Staging') {
+        agent {
+            docker {
+                image 'mcr.microsoft.com/playwright:v1.50.0'
+                reuseNode true
+            }
+        }
+        steps {
+            sh '''
+                npx playwright test --reporter=html
+                '''
+            }
+            post {
+                always {
+                   publishHTML([
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Production',
+                    reportTitles: '',
+                    useWrapperFileDirectly: true
+                    ])
+                }
+            }
+        }
+
+        stage('Deploy - Netlify - Production') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -103,34 +154,6 @@ pipeline {
                         --site=$NETLIFY_SITE_ID \
                         --auth=$NETLIFY_AUTH_TOKEN
                 '''
-            }
-        }
-
-        stage('E2E - Production') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0'
-                    reuseNode true
-                }
-            }
-            steps {
-                sh '''
-                    npx playwright test --reporter=html
-                '''
-            }
-            post {
-                always {
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false,
-                        reportDir: 'playwright-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Playwright Production',
-                        reportTitles: '',
-                        useWrapperFileDirectly: true
-                    ])
-                }
             }
         }
     }
