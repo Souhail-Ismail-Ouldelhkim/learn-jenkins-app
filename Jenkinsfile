@@ -8,7 +8,6 @@ pipeline {
     }
 
     stages {
-
         stage('Build') {
             agent {
                 docker {
@@ -30,7 +29,6 @@ pipeline {
 
         stage('Tests') {
             parallel {
-
                 stage('Unit tests') {
                     agent {
                         docker {
@@ -104,30 +102,30 @@ pipeline {
                 '''
             }
         }
-        
+
         stage('E2E - Staging') {
-        agent {
-            docker {
-                image 'mcr.microsoft.com/playwright:v1.50.0'
-                reuseNode true
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.50.0'
+                    reuseNode true
+                }
             }
-        }
-        steps {
-            sh '''
-                npx playwright test --reporter=html
+            steps {
+                sh '''
+                    npx playwright test --reporter=html
                 '''
             }
             post {
                 always {
-                   publishHTML([
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: false,
-                    keepAll: false,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Production',
-                    reportTitles: '',
-                    useWrapperFileDirectly: true
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: false,
+                        reportDir: 'playwright-report',
+                        reportFiles: 'index.html',
+                        reportName: 'Playwright Staging',
+                        reportTitles: '',
+                        useWrapperFileDirectly: true
                     ])
                 }
             }
