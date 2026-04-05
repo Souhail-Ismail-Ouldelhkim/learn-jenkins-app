@@ -99,7 +99,19 @@ pipeline {
                         --no-build \
                         --site=$NETLIFY_SITE_ID \
                         --auth=$NETLIFY_AUTH_TOKEN
+
+                    echo "---Contenu de fichier------"
+                    cat deploy-output.txt
                 '''
+                script {
+                    // Extraire l'URL depuis le texte
+                    def deployUrl = sh(
+                script: "grep -o 'https://[a-zA-Z0-9-]*\\.netlify\\.app' deploy-output.txt | head -1",
+                returnStdout: true
+            ).trim()
+                    env.STAGING_URL = deployUrl
+                    echo "Staging URL capturée: ${env.STAGING_URL}"
+                }
             }
         }
 
@@ -110,23 +122,26 @@ pipeline {
                     reuseNode true
                 }
             }
+            environment {
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+            }
             steps {
                 sh '''
-                    npx playwright test --reporter=html
-                '''
+            npx playwright test --reporter=html
+        '''
             }
             post {
                 always {
                     publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: false,
-                        keepAll: false,
-                        reportDir: 'playwright-report',
-                        reportFiles: 'index.html',
-                        reportName: 'Playwright Staging',
-                        reportTitles: '',
-                        useWrapperFileDirectly: true
-                    ])
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: false,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright Staging',
+                reportTitles: '',
+                useWrapperFileDirectly: true
+            ])
                 }
             }
         }
@@ -151,6 +166,37 @@ pipeline {
                         --site=$NETLIFY_SITE_ID \
                         --auth=$NETLIFY_AUTH_TOKEN
                 '''
+            }
+        }
+
+        stage('E2E - Production') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.50.0'
+                    reuseNode true
+                }
+            }
+            environment {
+                CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}" // URL fixe depuis le top du pipeline
+            }
+            steps {
+                sh '''
+            npx playwright test --reporter=html
+        '''
+            }
+            post {
+                always {
+                    publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: false,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright Production',
+                reportTitles: '',
+                useWrapperFileDirectly: true
+            ])
+                }
             }
         }
     }
