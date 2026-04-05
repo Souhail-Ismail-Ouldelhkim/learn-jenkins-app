@@ -111,6 +111,7 @@ pipeline {
             ).trim()
                     env.STAGING_URL = deployUrl
                     echo "Staging URL capturée: ${env.STAGING_URL}"
+                    echo'Znything'
                 }
             }
         }
