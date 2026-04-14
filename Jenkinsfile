@@ -1,6 +1,5 @@
 pipeline {
     agent any
-
     environment {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
@@ -104,7 +103,6 @@ pipeline {
                     cat deploy-output.txt
                 '''
                 script {
-                    // Extraire l'URL depuis le texte
                     def deployUrl = sh(
                 script: "grep -o 'https://[a-zA-Z0-9-]*\\.netlify\\.app' deploy-output.txt | head -1",
                 returnStdout: true
