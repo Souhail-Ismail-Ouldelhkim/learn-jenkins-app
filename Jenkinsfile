@@ -96,8 +96,7 @@ pipeline {
                     node_modules/.bin/netlify deploy \
                         --dir=build \
                         --no-build \
-                        --site=$NETLIFY_SITE_ID \
-                        --auth=${NETLIFY_AUTH_TOKEN}
+                        --site=$NETLIFY_SITE_ID 
 
                     echo "---Contenu de fichier------"
                     cat deploy-output.txt
