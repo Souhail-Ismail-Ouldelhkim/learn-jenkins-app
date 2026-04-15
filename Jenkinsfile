@@ -80,7 +80,7 @@ pipeline {
             }
         }
 
-        stage('Deploy - Netlify - Staging') {
+        stage('Deploy - Netlify - staging') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -91,7 +91,7 @@ pipeline {
                 sh '''
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
-                    echo "Deploying to Staging. Site ID: $NETLIFY_SITE_ID"
+                    echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status --auth=$NETLIFY_AUTH_TOKEN
                     node_modules/.bin/netlify deploy \
                         --dir=build \
@@ -107,14 +107,14 @@ pipeline {
                 script: "grep -o 'https://[a-zA-Z0-9-]*\\.netlify\\.app' deploy-output.txt | head -1",
                 returnStdout: true
             ).trim()
-                    env.STAGING_URL = deployUrl
-                    echo "Staging URL capturée: ${env.STAGING_URL}"
+                    env.staging_URL = deployUrl
+                    echo "staging URL capturée: ${env.staging_URL}"
                     echo'Znything'
                 }
             }
         }
 
-        stage('E2E - Staging') {
+        stage('E2E - staging') {
             agent {
                 docker {
                     image 'mcr.microsoft.com/playwright:v1.50.0'
@@ -122,7 +122,7 @@ pipeline {
                 }
             }
             environment {
-                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
+                CI_ENVIRONMENT_URL = "${env.staging_URL}"
             }
             steps {
                 sh '''
@@ -137,7 +137,7 @@ pipeline {
                 keepAll: false,
                 reportDir: 'playwright-report',
                 reportFiles: 'index.html',
-                reportName: 'Playwright Staging',
+                reportName: 'Playwright staging',
                 reportTitles: '',
                 useWrapperFileDirectly: true
             ])
