@@ -144,6 +144,17 @@ pipeline {
             }
         }
 
+        stage('approval')
+         {
+            steps
+            {
+                timeout(time: 10, unit: 'SECONDS')
+                {
+                    input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
+                }
+            }
+        }
+
         stage('Deploy - Netlify - Production') {
             agent {
                 docker {
@@ -165,17 +176,6 @@ pipeline {
                         --auth=$NETLIFY_AUTH_TOKEN
                 '''
             }
-        }
-
-        stage('approval')
-        {
-            steps
-           {
-                timeout(time: 10, unit: 'SECONDS')
-              {
-                    input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
-              }
-           }
         }
 
         stage('E2E - Production') {
