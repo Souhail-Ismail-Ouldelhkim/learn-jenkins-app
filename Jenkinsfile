@@ -99,6 +99,7 @@ pipeline {
                         --site=$NETLIFY_SITE_ID
 
                     echo "---Contenu de fichier------"
+
                 '''
                 script {
                     def deployUrl = sh(
@@ -164,6 +165,17 @@ pipeline {
                         --auth=$NETLIFY_AUTH_TOKEN
                 '''
             }
+        }
+
+        stage('approval')
+        {
+            steps
+           {
+                timeout(time: 10, unit: 'SECONDS')
+              {
+                    input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
+              }
+           }
         }
 
         stage('E2E - Production') {
