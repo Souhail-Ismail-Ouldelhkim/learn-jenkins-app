@@ -96,10 +96,9 @@ pipeline {
                     node_modules/.bin/netlify deploy \
                         --dir=build \
                         --no-build \
-                        --site=$NETLIFY_SITE_ID 
+                        --site=$NETLIFY_SITE_ID
 
                     echo "---Contenu de fichier------"
-                    cat deploy-output.txt
                 '''
                 script {
                     def deployUrl = sh(
