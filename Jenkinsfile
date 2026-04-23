@@ -80,6 +80,7 @@ pipeline {
             }
         }
 
+        stages {
         stage('Deploy - Netlify - staging') {
             agent {
                 docker {
@@ -89,48 +90,48 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install netlify-cli
-                    node_modules/.bin/netlify --version
-                    echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
-                    node_modules/.bin/netlify status --auth=$NETLIFY_AUTH_TOKEN
-                    node_modules/.bin/netlify deploy \
-                        --dir=build \
-                        --no-build \
-                        --site=$NETLIFY_SITE_ID --json
+    npm install netlify-cli
+    node_modules/.bin/netlify --version
+    echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
 
-                    echo "---Contenu de fichier------"
+    node_modules/.bin/netlify deploy \
+        --dir=build \
+        --no-build \
+        --site=$NETLIFY_SITE_ID \
+        --auth=$NETLIFY_AUTH_TOKEN 2>&1 | tee deploy-output.txt
 
-                '''
-                script {
-                    def deployUrl = sh(
-                script: "grep -o 'https://[a-zA-Z0-9-]*\\.netlify\\.app' deploy-output.txt | head -1",
-                returnStdout: true
-            ).trim()
-                    env.staging_URL = deployUrl
-                    echo "staging URL capturée: ${env.staging_URL}"
-                    echo'Znything'
-                }
+    DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9.-]*" deploy-output.txt | head -1)
+    echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
+    cat staging-url.txt
+'''
+
+script {
+    def content = readFile('staging-url.txt').trim()
+    env.staging_URL = content.replace('STAGING_URL=', '')
+    echo "✅ staging URL: ${env.staging_URL}"
+}
             }
         }
+    }
 
-        stage('E2E - staging') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0'
-                    reuseNode true
+            stage('E2E - staging') {
+                agent {
+                    docker {
+                        image 'mcr.microsoft.com/playwright:v1.50.0'
+                        reuseNode true
+                    }
                 }
-            }
-            environment {
-                CI_ENVIRONMENT_URL = "${env.staging_URL}"
-            }
-            steps {
-                sh '''
+                environment {
+                    CI_ENVIRONMENT_URL = "${env.staging_URL}"
+                }
+                steps {
+                    sh '''
             npx playwright test --reporter=html
         '''
-            }
-            post {
-                always {
-                    publishHTML([
+                }
+                post {
+                    always {
+                        publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: false,
                 keepAll: false,
@@ -140,30 +141,30 @@ pipeline {
                 reportTitles: '',
                 useWrapperFileDirectly: true
             ])
+                    }
                 }
             }
-        }
 
-        stage('approval')
-         {
-            steps
+            stage('approval')
             {
-                timeout(time: 10, unit: 'SECONDS')
-                {
-                    input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
-                }
+                steps
+                   {
+                    timeout(time: 10, unit: 'SECONDS')
+                    {
+                        input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
+                    }
+                   }
             }
-         }
 
-        stage('Deploy - Netlify - Production') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
+            stage('Deploy - Netlify - Production') {
+                agent {
+                    docker {
+                        image 'node:18-alpine'
+                        reuseNode true
+                    }
                 }
-            }
-            steps {
-                sh '''
+                steps {
+                    sh '''
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
@@ -175,27 +176,27 @@ pipeline {
                         --site=$NETLIFY_SITE_ID \
                         --auth=$NETLIFY_AUTH_TOKEN
                 '''
-            }
-        }
-
-        stage('E2E - Production') {
-            agent {
-                docker {
-                    image 'mcr.microsoft.com/playwright:v1.50.0'
-                    reuseNode true
                 }
             }
-            environment {
-                CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}" // URL fixe depuis le top du pipeline
-            }
-            steps {
-                sh '''
+
+            stage('E2E - Production') {
+                agent {
+                    docker {
+                        image 'mcr.microsoft.com/playwright:v1.50.0'
+                        reuseNode true
+                    }
+                }
+                environment {
+                    CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}" // URL fixe depuis le top du pipeline
+                }
+                steps {
+                    sh '''
             npx playwright test --reporter=html
         '''
-            }
-            post {
-                always {
-                    publishHTML([
+                }
+                post {
+                    always {
+                        publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: false,
                 keepAll: false,
@@ -205,6 +206,7 @@ pipeline {
                 reportTitles: '',
                 useWrapperFileDirectly: true
             ])
+                    }
                 }
             }
         }
