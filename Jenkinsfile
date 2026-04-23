@@ -90,20 +90,20 @@ pipeline {
                 }
                 steps {
                     sh '''
-    npm install netlify-cli
-    node_modules/.bin/netlify --version
-    echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
+                npm install netlify-cli
+                node_modules/.bin/netlify --version
+                echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
 
-    node_modules/.bin/netlify deploy \
-        --dir=build \
-        --no-build \
-        --site=$NETLIFY_SITE_ID \
-        --auth=$NETLIFY_AUTH_TOKEN 2>&1 | tee deploy-output.txt
+                node_modules/.bin/netlify deploy \
+                    --dir=build \
+                    --no-build \
+                    --site=$NETLIFY_SITE_ID \
+                    --auth=$NETLIFY_AUTH_TOKEN 2>&1 | tee deploy-output.txt
 
-    DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9.-]*" deploy-output.txt | head -1)
-    echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
-    cat staging-url.txt
-'''
+                DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9.-]*" deploy-output.txt | head -1)
+                echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
+                cat staging-url.txt
+            '''
 
                     script {
                         def content = readFile('staging-url.txt').trim()
