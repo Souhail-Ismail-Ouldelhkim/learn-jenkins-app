@@ -80,7 +80,6 @@ pipeline {
             }
         }
 
-        stages {
             stage('Deploy - Netlify - staging') {
                 agent {
                     docker {
@@ -112,7 +111,6 @@ pipeline {
                     }
                 }
             }
-        }
 
             stage('E2E - staging') {
                 agent {
