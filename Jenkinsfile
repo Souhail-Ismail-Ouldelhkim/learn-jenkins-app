@@ -89,9 +89,7 @@ pipeline {
                 }
                 steps {
                     sh '''
-                npm install netlify-cli
-                # Commande system alpine pas dans le node_modules
-                apk add jq
+                npm install netlify-cli node-jq
                 node_modules/.bin/netlify --version
                 echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
 
@@ -101,7 +99,7 @@ pipeline {
                     --site=$NETLIFY_SITE_ID \
                     --auth=$NETLIFY_AUTH_TOKEN --json > deploy-output.txt
 
-                jq -r '.deploy_url' deploy-output.txt > staging-url.txt
+                node_modules/.bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
 
                # DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9-]*\\.netlify\\.app" deploy-output.txt | head -1)
                # echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
