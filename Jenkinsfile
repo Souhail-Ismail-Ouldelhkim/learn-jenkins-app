@@ -99,7 +99,7 @@ pipeline {
                     --site=$NETLIFY_SITE_ID \
                     --auth=$NETLIFY_AUTH_TOKEN --json > deploy-output.txt
 
-                node_modules/.bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
+                node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
 
                # DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9-]*\\.netlify\\.app" deploy-output.txt | head -1)
                # echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
