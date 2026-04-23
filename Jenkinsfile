@@ -81,15 +81,15 @@ pipeline {
         }
 
         stages {
-        stage('Deploy - Netlify - staging') {
-            agent {
-                docker {
-                    image 'node:18-alpine'
-                    reuseNode true
+            stage('Deploy - Netlify - staging') {
+                agent {
+                    docker {
+                        image 'node:18-alpine'
+                        reuseNode true
+                    }
                 }
-            }
-            steps {
-                sh '''
+                steps {
+                    sh '''
     npm install netlify-cli
     node_modules/.bin/netlify --version
     echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
@@ -105,14 +105,14 @@ pipeline {
     cat staging-url.txt
 '''
 
-script {
-    def content = readFile('staging-url.txt').trim()
-    env.staging_URL = content.replace('STAGING_URL=', '')
-    echo "✅ staging URL: ${env.staging_URL}"
-}
+                    script {
+                        def content = readFile('staging-url.txt').trim()
+                        env.staging_URL = content.replace('STAGING_URL=', '')
+                        echo "✅ staging URL: ${env.staging_URL}"
+                    }
+                }
             }
         }
-    }
 
             stage('E2E - staging') {
                 agent {
@@ -209,6 +209,5 @@ script {
                     }
                 }
             }
-        }
     }
 }
