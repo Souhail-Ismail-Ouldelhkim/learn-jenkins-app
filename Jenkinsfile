@@ -99,7 +99,7 @@ pipeline {
                     --site=$NETLIFY_SITE_ID \
                     --auth=$NETLIFY_AUTH_TOKEN --json > deploy-output.txt
 
-                DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9-]*\.netlify\.app" deploy-output.txt | head -1)
+                DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9-]*\\.netlify\\.app" deploy-output.txt | head -1)
                 echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
                 cat staging-url.txt
                 '''
