@@ -80,7 +80,7 @@ pipeline {
             }
         }
 
-      /*      stage('Deploy - Netlify - staging') {
+        /*    stage('Deploy - Netlify - staging') {
                 agent {
                     docker {
                         image 'node:18-alpine'
@@ -95,12 +95,6 @@ pipeline {
                # echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
                # cat staging-url.txt
                 '''
-
-                    script {
-                        def content = readFile('staging-url.txt').trim()
-                        env.staging_URL = content.replace('STAGING_URL=', '')
-                        echo "✅ staging URL: ${env.staging_URL}"
-                    }
                 }
             }
 */
@@ -130,6 +124,12 @@ pipeline {
                 node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
                     npx playwright test --reporter=html
                       '''
+
+                script {
+                        def content = readFile('staging-url.txt').trim()
+                        env.staging_URL = content.replace('STAGING_URL=', '')
+                        echo "✅ staging URL: ${env.staging_URL}"
+                }
                 }
                 post {
                     always {
