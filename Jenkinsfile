@@ -98,44 +98,43 @@ pipeline {
                 }
         }
 */
-            stage('Deploy - E2E - staging') {
-                agent {
-                    docker {
-                        image 'mcr.microsoft.com/playwright:v1.50.0'
-                        reuseNode true
-                    }
+        stage('Deploy - E2E - staging') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.50.0'
+                    reuseNode true
                 }
+            }
+            steps {
+                sh '''
+            node -v
+            npm install netlify-cli node-jq
+            node_modules/.bin/netlify --version
+            echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
 
-                steps {
-                    sh '''
-                    node -v
-                    npm install netlify-cli node-jq
-                    node_modules/.bin/netlify --version
-                echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
+            node_modules/.bin/netlify deploy \
+                --dir=build \
+                --no-build \
+                --site=$NETLIFY_SITE_ID \
+                --auth=$NETLIFY_AUTH_TOKEN \
+                --json > deploy-output.txt
 
-                node_modules/.bin/netlify deploy \
-                    --dir=build \
-                    --no-build \
-                    --site=$NETLIFY_SITE_ID \
-                    --auth=$NETLIFY_AUTH_TOKEN --json > deploy-output.txt
-
-                node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
-                    npx playwright test --reporter=html
-                      '''
+            node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
+            cat staging-url.txt
+        '''
 
                 script {
                         def content = readFile('staging-url.txt').trim()
                         env.staging_URL = content.replace('STAGING_URL=', '')
-                        echo "✅ staging URL: ${env.staging_URL}"
+                        echo "staging URL: ${env.staging_URL}"
                 }
-
-                environment {
-                    CI_ENVIRONMENT_URL = "${env.staging_URL}"
-                }
-                }
-                post {
-                    always {
-                        publishHTML([
+                sh '''
+            npx playwright test --reporter=html  // après script{}
+        '''
+            }
+            post {
+                always {
+                    publishHTML([
                 allowMissing: false,
                 alwaysLinkToLastBuild: false,
                 keepAll: false,
@@ -145,9 +144,9 @@ pipeline {
                 reportTitles: '',
                 useWrapperFileDirectly: true
             ])
-                    }
                 }
             }
+        }
 
             stage('approval')
             {
