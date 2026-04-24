@@ -124,9 +124,10 @@ pipeline {
         '''
 
                 script {
-                        def content = readFile('staging-url.txt').trim()
-                        env.staging_URL = content.replace('STAGING_URL=', '')
-                        echo "staging URL: ${env.staging_URL}"
+                    def content = readFile('staging-url.txt').trim()
+                    env.staging_URL = content.replace('STAGING_URL=', '')
+                    env.CI_ENVIRONMENT_URL = env.staging_URL  
+                    echo "staging URL: ${env.staging_URL}"
                 }
                 sh '''
             npx playwright test --reporter=html  // après script{}
