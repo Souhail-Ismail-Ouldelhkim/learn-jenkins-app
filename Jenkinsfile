@@ -126,7 +126,7 @@ pipeline {
                 script {
                     def content = readFile('staging-url.txt').trim()
                     env.staging_URL = content.replace('STAGING_URL=', '')
-                    env.CI_ENVIRONMENT_URL = env.staging_URL  
+                    env.CI_ENVIRONMENT_URL = env.staging_URL
                     echo "staging URL: ${env.staging_URL}"
                 }
                 sh '''
@@ -159,13 +159,16 @@ pipeline {
                     }
                    }
             }
-
-            stage('Deploy - Netlify - Production') {
+            // URL Fixe Toujours
+            stage('Deploy - E2E - Production') {
                 agent {
                     docker {
-                        image 'node:18-alpine'
+                        image 'mcr.microsoft.com/playwright:v1.50.0'
                         reuseNode true
                     }
+                }
+                environment {
+                    CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}" // URL fixe depuis le top du pipeline
                 }
                 steps {
                     sh '''
@@ -179,22 +182,6 @@ pipeline {
                         --no-build \
                         --site=$NETLIFY_SITE_ID \
                         --auth=$NETLIFY_AUTH_TOKEN
-                '''
-                }
-            }
-
-            stage('E2E - Production') {
-                agent {
-                    docker {
-                        image 'mcr.microsoft.com/playwright:v1.50.0'
-                        reuseNode true
-                    }
-                }
-                environment {
-                    CI_ENVIRONMENT_URL = "${env.CI_ENVIRONMENT_URL}" // URL fixe depuis le top du pipeline
-                }
-                steps {
-                    sh '''
             npx playwright test --reporter=html
         '''
                 }
