@@ -105,6 +105,7 @@ pipeline {
                         reuseNode true
                     }
                 }
+
                 steps {
                     sh '''
                     node -v
@@ -127,6 +128,7 @@ pipeline {
                         env.staging_URL = content.replace('STAGING_URL=', '')
                         echo "✅ staging URL: ${env.staging_URL}"
                 }
+
                 environment {
                     CI_ENVIRONMENT_URL = "${env.staging_URL}"
                 }
