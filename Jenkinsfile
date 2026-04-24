@@ -96,7 +96,7 @@ pipeline {
                # cat staging-url.txt
                 '''
                 }
-            }
+        }
 */
             stage('Deploy - E2E - staging') {
                 agent {
@@ -104,9 +104,6 @@ pipeline {
                         image 'mcr.microsoft.com/playwright:v1.50.0'
                         reuseNode true
                     }
-                }
-                environment {
-                    CI_ENVIRONMENT_URL = "${env.staging_URL}"
                 }
                 steps {
                     sh '''
@@ -129,6 +126,9 @@ pipeline {
                         def content = readFile('staging-url.txt').trim()
                         env.staging_URL = content.replace('STAGING_URL=', '')
                         echo "✅ staging URL: ${env.staging_URL}"
+                }
+                environment {
+                    CI_ENVIRONMENT_URL = "${env.staging_URL}"
                 }
                 }
                 post {
