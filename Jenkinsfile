@@ -80,7 +80,7 @@ pipeline {
             }
         }
 
-            stage('Deploy - Netlify - staging') {
+      /*      stage('Deploy - Netlify - staging') {
                 agent {
                     docker {
                         image 'node:18-alpine'
@@ -89,17 +89,7 @@ pipeline {
                 }
                 steps {
                     sh '''
-                npm install netlify-cli node-jq
-                node_modules/.bin/netlify --version
-                echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
-
-                node_modules/.bin/netlify deploy \
-                    --dir=build \
-                    --no-build \
-                    --site=$NETLIFY_SITE_ID \
-                    --auth=$NETLIFY_AUTH_TOKEN --json > deploy-output.txt
-
-                node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
+               # vide Fusion
 
                # DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9-]*\\.netlify\\.app" deploy-output.txt | head -1)
                # echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
@@ -113,8 +103,8 @@ pipeline {
                     }
                 }
             }
-
-            stage('E2E - staging') {
+*/
+            stage('Deploy - E2E - staging') {
                 agent {
                     docker {
                         image 'mcr.microsoft.com/playwright:v1.50.0'
@@ -126,8 +116,20 @@ pipeline {
                 }
                 steps {
                     sh '''
-            npx playwright test --reporter=html
-        '''
+                    node -v
+                    npm install netlify-cli node-jq
+                    node_modules/.bin/netlify --version
+                echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
+
+                node_modules/.bin/netlify deploy \
+                    --dir=build \
+                    --no-build \
+                    --site=$NETLIFY_SITE_ID \
+                    --auth=$NETLIFY_AUTH_TOKEN --json > deploy-output.txt
+
+                node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
+                    npx playwright test --reporter=html
+                      '''
                 }
                 post {
                     always {
