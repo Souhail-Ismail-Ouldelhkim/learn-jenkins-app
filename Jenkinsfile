@@ -20,10 +20,8 @@ pipeline {
                     ls -la
                     node --version
                     npm --version
-                    echo "REACT_APP_VERSION = $REACT_APP_VERSION"
                     npm ci
                     npm run build
-                    grep -r "1.0" build/static/js/*.js | head -3
                     ls -la
                 '''
             }
