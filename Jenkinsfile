@@ -4,7 +4,7 @@ pipeline {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
-        REACT_APP_VERSION = '1.2.3'
+       // REACT_APP_VERSION = '1.2.3'
     }
 
     stages {
