@@ -4,6 +4,7 @@ pipeline {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
+        REACT_APP_VERSION = '1.2.3.3'
     }
 
     stages {
@@ -149,7 +150,7 @@ pipeline {
             }
         }
 
-            stage('approval')
+          /*  stage('approval')
             {
                 steps
                    {
@@ -158,7 +159,7 @@ pipeline {
                         input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
                     }
                    }
-            }
+            }*/
             // URL Fixe Toujours
             stage('Deploy - E2E - Production') {
                 agent {
