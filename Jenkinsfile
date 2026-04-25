@@ -4,7 +4,7 @@ pipeline {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
-       // REACT_APP_VERSION = '1.2.3'
+        REACT_APP_VERSION = '1.2.3'
     }
 
     stages {
@@ -17,6 +17,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                     ls -la
                     node --version
                     npm --version
@@ -57,9 +58,11 @@ pipeline {
                     }
                     steps {
                         sh '''
+                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                             npm install serve
                             node_modules/.bin/serve -s build &
                             sleep 10
+                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                             npx playwright test --reporter=html
                         '''
                     }
