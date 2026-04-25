@@ -25,6 +25,13 @@ test("has expected app version", async ({ page }) => {
     ? process.env.REACT_APP_VERSION
     : "1";
 
+  // added
+  console.log("Test cherche version:", expectedAppVersion);
+
+  // added
+  const pageContent = await page.locator("p").allTextContents();
+  console.log("Page contient:", pageContent);
+
   console.log(expectedAppVersion);
 
   const isVisible = await page
