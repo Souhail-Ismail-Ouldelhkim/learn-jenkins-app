@@ -63,7 +63,7 @@ pipeline {
                             grep -r "1.0" build/static/js/main*.js | head -1
                             npm install serve
                             node_modules/.bin/serve -s build &
-                            sleep 10
+                            sleep 60
                             echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                             npx playwright test --reporter=html
                             echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
