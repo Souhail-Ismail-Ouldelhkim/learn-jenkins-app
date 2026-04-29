@@ -129,6 +129,7 @@ pipeline {
 
             node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
             cat staging-url.txt
+            npx playwright test --reporter=html  // après script{}
         '''
 
                 script {
@@ -137,9 +138,6 @@ pipeline {
                     env.CI_ENVIRONMENT_URL = env.staging_URL
                     echo "staging URL: ${env.staging_URL}"
                 }
-                sh '''
-            npx playwright test --reporter=html  // après script{}
-        '''
             }
             post {
                 always {
