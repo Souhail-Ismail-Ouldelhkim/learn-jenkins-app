@@ -3,7 +3,7 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
-        CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
+        // CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
         REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
 
@@ -112,6 +112,10 @@ pipeline {
                     image 'mcr.microsoft.com/playwright:v1.50.0'
                     reuseNode true
                 }
+            }
+
+             environment {
+                CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
             }
             steps {
                 sh '''
