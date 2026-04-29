@@ -3,14 +3,11 @@ const { test, expect } = require("@playwright/test");
 
 test("has title", async ({ page }) => {
   await page.goto("/");
-
-  // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Learn Jenkins/);
 });
 
 test("has Jenkins in the body", async ({ page }) => {
   await page.goto("/");
-
   const isVisible = await page
     .locator('a:has-text("Learn Jenkins on Udemy")')
     .isVisible();
@@ -20,23 +17,15 @@ test("has Jenkins in the body", async ({ page }) => {
 test("has expected app version", async ({ page }) => {
   await page.goto("/");
 
-  // test vérification de version de l'application
   const expectedAppVersion = process.env.REACT_APP_VERSION
     ? process.env.REACT_APP_VERSION
     : "1";
 
-  // added
   console.log("Test cherche version:", expectedAppVersion);
 
-  // added
-  const pageContent = await page.locator("p").allTextContents();
-  console.log("Page contient:", pageContent);
+  // ✅ textContent() récupère tout le texte du <p>
+  const pageText = await page.locator("p").textContent();
+  console.log("Page contient:", pageText);
 
-  console.log(expectedAppVersion);
-
-  const isVisible = await page
-    .locator("p")
-    .filter({ hasText: `Application version: ${expectedAppVersion}` })
-    .isVisible();
-  expect(isVisible).toBeTruthy();
+  expect(pageText).toContain(`Application version: ${expectedAppVersion}`);
 });
