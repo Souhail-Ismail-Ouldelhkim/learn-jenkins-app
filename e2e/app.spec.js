@@ -35,7 +35,8 @@ test("has expected app version", async ({ page }) => {
   console.log(expectedAppVersion);
 
   const isVisible = await page
-    .locator(`p:has-text("Application version: ${expectedAppVersion}")`)
+    .locator("p")
+    .filter({ hasText: `Application version: ${expectedAppVersion}` })
     .isVisible();
   expect(isVisible).toBeTruthy();
 });
