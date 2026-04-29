@@ -56,6 +56,9 @@ pipeline {
                             reuseNode true
                         }
                     }
+                    environment {
+                        CI_ENVIRONMENT_URL = 'http://localhost:3000'  // ✅ force localhost
+                    }
                     steps {
                         sh '''
                             echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
