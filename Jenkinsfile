@@ -4,6 +4,7 @@ pipeline {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
         CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
+        REACT_APP_VERSION = "1.0.$BUILD_ID"
     }
 
     stages {
@@ -16,6 +17,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                     ls -la
                     node --version
                     npm --version
@@ -54,12 +56,18 @@ pipeline {
                             reuseNode true
                         }
                     }
+                    environment {
+                        CI_ENVIRONMENT_URL = 'http://localhost:3000'
+                    }
                     steps {
                         sh '''
+                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                             npm install serve
                             node_modules/.bin/serve -s build &
-                            sleep 10
+                            sleep 60
+                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                             npx playwright test --reporter=html
+                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                         '''
                     }
                     post {
@@ -80,24 +88,6 @@ pipeline {
             }
         }
 
-        /*    stage('Deploy - Netlify - staging') {
-                agent {
-                    docker {
-                        image 'node:18-alpine'
-                        reuseNode true
-                    }
-                }
-                steps {
-                    sh '''
-               # vide Fusion
-
-               # DEPLOY_URL=$(grep -o "https://[a-zA-Z0-9-]*--[a-zA-Z0-9-]*\\.netlify\\.app" deploy-output.txt | head -1)
-               # echo "STAGING_URL=$DEPLOY_URL" > staging-url.txt
-               # cat staging-url.txt
-                '''
-                }
-        }
-*/
         stage('Deploy - E2E - staging') {
             agent {
                 docker {
@@ -117,20 +107,11 @@ pipeline {
                 --no-build \
                 --site=$NETLIFY_SITE_ID \
                 --auth=$NETLIFY_AUTH_TOKEN \
-                --json > deploy-output.txt
+                --json > deploy-output.json
 
-            node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
-            cat staging-url.txt
-        '''
-
-                script {
-                    def content = readFile('staging-url.txt').trim()
-                    env.staging_URL = content.replace('STAGING_URL=', '')
-                    env.CI_ENVIRONMENT_URL = env.staging_URL
-                    echo "staging URL: ${env.staging_URL}"
-                }
-                sh '''
-            npx playwright test --reporter=html  // après script{}
+            export CI_ENVIRONMENT_URL=$(node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.json)
+            echo "Staging URL: $CI_ENVIRONMENT_URL"
+            npx playwright test --reporter=html
         '''
             }
             post {
@@ -149,16 +130,6 @@ pipeline {
             }
         }
 
-            stage('approval')
-            {
-                steps
-                   {
-                    timeout(time: 30, unit: 'SECONDS')
-                    {
-                        input message: 'Ready to deploy ???', ok: 'Yes, I\'m sure to deploy'
-                    }
-                   }
-            }
             // URL Fixe Toujours
             stage('Deploy - E2E - Production') {
                 agent {
