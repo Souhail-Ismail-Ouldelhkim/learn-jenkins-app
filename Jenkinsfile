@@ -3,8 +3,8 @@ pipeline {
     environment {
         NETLIFY_SITE_ID = '98205f75-7686-46bc-9b5d-4d9149cca3b0'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
-        // CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
-        REACT_APP_VERSION = "1.0.$BUILD_ID"
+        CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
+        REACT_APP_VERSION = '1.2.3.3'
     }
 
     stages {
@@ -17,7 +17,6 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                     ls -la
                     node --version
                     npm --version
@@ -56,18 +55,12 @@ pipeline {
                             reuseNode true
                         }
                     }
-                    environment {
-                        CI_ENVIRONMENT_URL = 'http://localhost:3000'  // ✅ force localhost
-                    }
                     steps {
                         sh '''
-                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                             npm install serve
                             node_modules/.bin/serve -s build &
-                            sleep 60
-                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
+                            sleep 10
                             npx playwright test --reporter=html
-                            echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                         '''
                     }
                     post {
@@ -113,10 +106,6 @@ pipeline {
                     reuseNode true
                 }
             }
-
-             environment {
-                CI_ENVIRONMENT_URL = 'https://my-jenkins-formation-deploy-netlify.netlify.app'
-            }
             steps {
                 sh '''
             node -v
@@ -133,7 +122,6 @@ pipeline {
 
             node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.txt > staging-url.txt
             cat staging-url.txt
-            npx playwright test --reporter=html  // après script{}
         '''
 
                 script {
@@ -142,6 +130,9 @@ pipeline {
                     env.CI_ENVIRONMENT_URL = env.staging_URL
                     echo "staging URL: ${env.staging_URL}"
                 }
+                sh '''
+            npx playwright test --reporter=html  // après script{}
+        '''
             }
             post {
                 always {
