@@ -8,11 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Docker') {
-            steps {
-                sh 'docker build -t my-playwright .'
-            }
-        }
         stage('Build') {
             agent {
                 docker {
@@ -96,24 +91,25 @@ pipeline {
         stage('Deploy - E2E - staging') {
             agent {
                 docker {
-                    image 'my-playwright'
+                    image 'mcr.microsoft.com/playwright:v1.50.0'
                     reuseNode true
                 }
             }
             steps {
                 sh '''
             node -v
-            netlify --version
+            npm install netlify-cli node-jq
+            node_modules/.bin/netlify --version
             echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
 
-            netlify deploy \
+            node_modules/.bin/netlify deploy \
                 --dir=build \
                 --no-build \
                 --site=$NETLIFY_SITE_ID \
                 --auth=$NETLIFY_AUTH_TOKEN \
                 --json > deploy-output.json
 
-            export CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)
+            export CI_ENVIRONMENT_URL=$(node_modules/node-jq/bin/jq -r '.deploy_url' deploy-output.json)
             echo "Staging URL: $CI_ENVIRONMENT_URL"
             npx playwright test --reporter=html
         '''
@@ -138,7 +134,7 @@ pipeline {
             stage('Deploy - E2E - Production') {
                 agent {
                     docker {
-                        image 'my-playwright'
+                        image 'mcr.microsoft.com/playwright:v1.50.0'
                         reuseNode true
                     }
                 }
@@ -147,17 +143,18 @@ pipeline {
                 }
                 steps {
                     sh '''
-                    netlify --version
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
-                    netlify status
-                    netlify deploy \
+                    node_modules/.bin/netlify status
+                    node_modules/.bin/netlify deploy \
                         --dir=build \
                         --prod \
                         --no-build \
                         --site=$NETLIFY_SITE_ID \
                         --auth=$NETLIFY_AUTH_TOKEN
-                    npx playwright test --reporter=html
-                    '''
+            npx playwright test --reporter=html
+        '''
                 }
                 post {
                     always {
