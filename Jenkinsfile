@@ -102,35 +102,25 @@ pipeline {
             }
             steps {
                 sh '''
-            node -v
-            netlify --version
-            echo "Deploying to staging. Site ID: $NETLIFY_SITE_ID"
 
-            netlify deploy \
+                netlify deploy \
                 --dir=build \
                 --no-build \
                 --site=$NETLIFY_SITE_ID \
                 --auth=$NETLIFY_AUTH_TOKEN \
                 --json > deploy-output.json
 
-            export CI_ENVIRONMENT_URL=$(jq -r '.deploy_url' deploy-output.json)
-            echo "Staging URL: $CI_ENVIRONMENT_URL"
-            npx playwright test --reporter=html
-        '''
-            }
-            post {
-                always {
-                    publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: false,
-                keepAll: false,
-                reportDir: 'playwright-report',
-                reportFiles: 'index.html',
-                reportName: 'Playwright staging',
-                reportTitles: '',
-                useWrapperFileDirectly: true
-            ])
+                '''
+                script {
+                    env.CI_ENVIRONMENT_URL = sh(
+                script: "jq -r '.deploy_url' deploy-output.json",
+                returnStdout: true
+                ).trim()
                 }
+                sh '''
+                echo "Staging URL: $CI_ENVIRONMENT_URL"
+                npx playwright test --reporter=html
+                '''
             }
         }
 
