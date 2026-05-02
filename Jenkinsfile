@@ -8,13 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker Images') {
-            steps {
-                sh '''
-               docker build -t my-playwright .
-                   '''
-            }
-        }
         stage('Docker') {
             steps {
                 sh 'docker build -t my-playwright .'
@@ -31,6 +24,7 @@ pipeline {
                 sh '''
                     echo "REACT_APP_VERSION dans E2E = $REACT_APP_VERSION"
                     ls -la
+                    npm install
                     node --version
                     npm --version
                     npm ci
