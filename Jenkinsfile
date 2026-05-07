@@ -119,8 +119,9 @@ pipeline {
                 }
                 sh '''
             echo "Staging URL: $CI_ENVIRONMENT_URL"
+            sleep 30
             npx playwright test --reporter=html
-        '''
+                  '''
             }
         }
 
