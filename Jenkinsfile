@@ -122,7 +122,7 @@ pipeline {
                 returnStdout: true
             ).trim()
 
-                    echo "=== 3. URL capturée dans Groovy: ${stagingUrl} ==="
+                 /*   echo "=== 3. URL capturée dans Groovy: ${stagingUrl} ==="
 
                     env.CI_ENVIRONMENT_URL = stagingUrl
 
@@ -131,6 +131,15 @@ pipeline {
                 echo "$CI_ENVIRONMENT_URL"
                 npx playwright test --reporter=html
             '''
+            */
+                    echo "URL staging: ${stagingUrl}"
+
+                    withEnv(["CI_ENVIRONMENT_URL=${stagingUrl}"]) {
+                        sh '''
+                    echo "CI_ENVIRONMENT_URL = $CI_ENVIRONMENT_URL"
+                    npx playwright test --reporter=html
+                '''
+                    }
                 }
             }
         }
