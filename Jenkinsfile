@@ -109,14 +109,26 @@ pipeline {
                     --site=$NETLIFY_SITE_ID \
                     --auth=$NETLIFY_AUTH_TOKEN \
                     --json > deploy-output.json
+
+                echo "=== 1. Contenu deploy-output.json ==="
                 cat deploy-output.json
+
+                echo "=== 2. URL extraite par jq ==="
+                jq -r '.deploy_url' deploy-output.json
             '''
-                    env.CI_ENVIRONMENT_URL = sh(
+
+                    def stagingUrl = sh(
                 script: "jq -r '.deploy_url' deploy-output.json",
                 returnStdout: true
             ).trim()
+
+                    echo "=== 3. URL capturée dans Groovy: ${stagingUrl} ==="
+
+                    env.CI_ENVIRONMENT_URL = stagingUrl
+
                     sh '''
-                echo "Staging URL: $CI_ENVIRONMENT_URL"
+                echo "=== 4. CI_ENVIRONMENT_URL final ==="
+                echo "$CI_ENVIRONMENT_URL"
                 npx playwright test --reporter=html
             '''
                 }
