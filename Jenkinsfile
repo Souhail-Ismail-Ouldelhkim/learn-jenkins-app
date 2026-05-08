@@ -101,30 +101,27 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-            netlify deploy \
-                --dir=build \
-                --no-build \
-                --site=$NETLIFY_SITE_ID \
-                --auth=$NETLIFY_AUTH_TOKEN \
-                --json > deploy-output.json
-            cat deploy-output.json
-        '''
                 script {
-                    // Écrase la variable globale avec l'URL staging
+                    sh '''
+                netlify deploy \
+                    --dir=build \
+                    --no-build \
+                    --site=$NETLIFY_SITE_ID \
+                    --auth=$NETLIFY_AUTH_TOKEN \
+                    --json > deploy-output.json
+                cat deploy-output.json
+            '''
                     env.CI_ENVIRONMENT_URL = sh(
                 script: "jq -r '.deploy_url' deploy-output.json",
                 returnStdout: true
             ).trim()
+                    sh '''
+                echo "Staging URL: $CI_ENVIRONMENT_URL"
+                npx playwright test --reporter=html
+            '''
                 }
-                sh '''
-            echo "Staging URL: $CI_ENVIRONMENT_URL"
-            sleep 30
-            npx playwright test --reporter=html
-                  '''
             }
         }
-
             // URL Fixe Toujours
             stage('Deploy - E2E - Production') {
                 agent {
